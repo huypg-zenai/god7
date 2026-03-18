@@ -1,0 +1,99 @@
+# API settings
+api:
+  api_title: "3D Generation Pipeline Service"
+  host: "0.0.0.0"
+  port: 10006
+  debug: false
+  timeout: 300.0
+  dynamic_params: false
+
+# Output settings
+output:
+  save_generated_files: false
+  send_generated_files: false
+  compression: false
+  output_dir: "generated_outputs"
+
+
+# Trellis model settings
+trellis:
+  model_id: "microsoft/TRELLIS.2-4B"
+  sparse_structure_steps: 16
+  sparse_structure_cfg_strength: 6.0
+  shape_slat_steps: 12
+  shape_cfg_strength: 3.0
+  tex_slat_steps: 20
+  tex_slat_cfg_strength: 6.0
+  pipeline_type: "512"  # "512_simple", "1024_cascade"
+  mode: "stochastic"  # "stochastic", "multidiffusion"
+  multiview: false
+  num_candidates: 4
+  num_edit_candidates: 3
+  voxel_complexity_thresholds:  # tiered: reduce candidates as voxel complexity rises
+    3: 3000   # above 20k tokens → 3 candidates
+    2: 4000   # above 30k tokens → 2 candidates
+    1: 5000   # above 40k tokens → 1 candidate
+  offload_decoders: true  # Move decoders/flow models to CPU after use to free VRAM for CuMesh
+  gpu: 0
+
+# Qwen model settings
+qwen:
+  base_model_path: "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors"
+  model_path: "Qwen/Qwen-Image-Edit-2511"
+  lora_path: "lightx2v/Qwen-Image-Edit-2511-Lightning"
+  lora_angles_path: ""
+  lora_angles_filename: ""
+  height: 1024
+  width: 1024
+  num_inference_steps: 4
+  true_cfg_scale: 1.0
+  prompt_path_base: "prompts/qwen_edit_prompt_v3.json"
+  gpu: 0
+  dtype: "bf16"
+  
+
+# Background removal model settings
+background_removal:
+  model_id: "ZhengPeng7/BiRefNet"
+  input_image_size: [1024, 1024]
+  padding_percentage: 0.1
+  limit_padding: false
+  gpu: 0
+
+# GLB Converter settings
+glb_converter:
+  decimation_target: 250000
+  texture_size: 2048
+  alpha_mode: "OPAQUE"
+  rescale: 1.0
+  subdivisions: 1
+  vertex_reproject: 0.1
+  alpha_gamma: 2.0
+  remesh: true
+  remesh_band: 1
+  remesh_project: 0.1
+  mesh_cluster_global_iterations: 1
+  mesh_cluster_refine_iterations: 0
+  mesh_cluster_smooth_strength: 0.15
+  mesh_cluster_threshold_cone_half_angle: 90
+  gpu: 0
+
+# VLLM Judge settings
+judge:
+  vllm_url: "http://localhost:8095/v1"
+  vllm_api_key: "local"
+  vllm_model_name: "THUDM/GLM-4.1V-9B-Thinking"
+  enabled: true
+  duel_margin: 1.5
+
+# Model versions (pinned HuggingFace model revisions)
+model_versions:
+  models:
+    "microsoft/TRELLIS.2-4B": "af44b45f2e35a493886929c6d786e563ec68364d"
+    "microsoft/TRELLIS-image-large": "25e0d31ffbebe4b5a97464dd851910efc3002d96"
+    "ZhengPeng7/BiRefNet": "26e7919b869d089e5096e898c0492898f935604c"
+    "ZhengPeng7/BiRefNet_dynamic": "6b6dad160e17b58bfc476c26e1d13827c910eed6"
+    "PramaLLC/BEN2": "e48a20765fb421d19dcdb0bf3cc61e802ca5ec8f"
+    "gray-apple/dino3": "31f2e9c01080ebe667542d4edc49ce670b0cf499"
+    "Qwen/Qwen-Image-Edit-2511": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9"
+    "lightx2v/Qwen-Image-Edit-2511-Lightning": "d74eba145674fd7e31b949324e148e21e7118abd"
