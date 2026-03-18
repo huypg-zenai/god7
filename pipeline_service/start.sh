@@ -56,42 +56,8 @@ echo "-----------------------------------------------------"
 python serve.py &
 SERVE_PID=$!
 
-# 4. Wait for FastAPI to be ready
-echo "Waiting for FastAPI to become ready..."
-MAX_RETRIES_API=25000
-COUNTER_API=0
+# 4. No auto requests; rely on pipeline warm-up.
+echo "Warm-up mode: skipping automatic FastAPI /health polling and generate requests"
 
-while [ $COUNTER_API -lt $MAX_RETRIES_API ]; do
-    if curl -s -f "http://localhost:10006/health" > /dev/null; then
-        echo "FastAPI is READY!"
-        break
-    fi
-    echo "   ... loading pipeline ($COUNTER_API/$MAX_RETRIES_API)"
-    sleep 5
-    let COUNTER_API=COUNTER_API+1
-done
-
-if [ $COUNTER_API -eq $MAX_RETRIES_API ]; then
-    echo "FastAPI failed to start within timeout."
-    kill $SERVE_PID $VLLM_PID 2>/dev/null
-    exit 1
-fi
-
-# 5. Auto-request with l1.png
-AUTO_IMAGE="/workspace/l1.png"
-AUTO_SEED=${AUTO_SEED:-42}
-if [ -f "$AUTO_IMAGE" ]; then
-    echo "-----------------------------------------------------"
-    echo "SENDING AUTO-REQUEST: $AUTO_IMAGE (seed=$AUTO_SEED)"
-    echo "-----------------------------------------------------"
-    curl -s -X POST "http://localhost:10006/generate" \
-        -F "prompt_image_file=@${AUTO_IMAGE}" \
-        -F "seed=${AUTO_SEED}" \
-        -o /workspace/auto_output.glb
-    echo "Auto-request done. Output: /workspace/auto_output.glb ($(stat -c%s /workspace/auto_output.glb 2>/dev/null || echo 0) bytes)"
-else
-    echo "No auto-request image found at $AUTO_IMAGE, skipping."
-fi
-
-# 6. Keep running — wait on the serve process
+# 5. Keep running — wait on the serve process
 wait $SERVE_PID

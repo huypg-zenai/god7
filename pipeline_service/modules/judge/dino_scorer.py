@@ -110,7 +110,7 @@ class DINOScorer:
 
         # Stability margin: only prefer a candidate over index 0 if its
         # score is meaningfully higher, not just within FP noise.
-        SCORE_MARGIN = 0.001
+        SCORE_MARGIN = 0.002
         best_idx = 0
         best_score = scores[0]
         for i, score in enumerate(scores[1:], 1):
