@@ -84,7 +84,7 @@ judge:
   vllm_api_key: "local"
   vllm_model_name: "THUDM/GLM-4.1V-9B-Thinking"
   enabled: true
-  duel_margin: 1.5
+  duel_margin: 1
 
 # Model versions (pinned HuggingFace model revisions)
 model_versions:
